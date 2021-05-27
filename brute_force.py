@@ -1,5 +1,7 @@
 import sys
+import csv
 from itertools import combinations
+import time
 
 
 class Brute_force(object):
@@ -23,7 +25,6 @@ class Brute_force(object):
 
     def brute_force(self):
         releated_list = [[x, y] for x, y in zip(self.profit_values, self.distance_values)]
-        print(releated_list)
         all_combinations = [list(map(list, combinations(releated_list, i))) for i in range(len(self.distance_values) + 1)]
         all_combinations.pop(0)
         valid_arrays = []
@@ -36,16 +37,29 @@ class Brute_force(object):
         return max(valid_arrays, key=lambda x: sum([y[0] for y in x]))  # return both of them
 
     def set_distance_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.distance_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        last_count = 0
+        for x in liste:
+            last_count += int(x)
+            self.distance_values.append(last_count)
 
     def set_profit_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.profit_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        self.profit_values = [int(x) for x in liste]
 
 
 if __name__ == "__main__":
-    brute_force = Brute_force(5, "distance.txt", "profit.txt")
-    print(brute_force.brute_force())
+    a = time.time()
+    brute_force = Brute_force(100, "Dist_on.csv", "Kar_on.csv")
+    result = sum([x[0] for x in brute_force.brute_force()])
+    b = time.time()
+    print(result)
+    print(b-a)
