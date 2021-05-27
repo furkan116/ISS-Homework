@@ -1,5 +1,7 @@
 import sys
 from itertools import combinations
+import csv
+import time
 
 
 class Dynamic_programming(object):
@@ -12,7 +14,6 @@ class Dynamic_programming(object):
 
     def dynamic_programming(self):
         releated_list = [[x, y] for x, y in zip(self.profit_values, self.distance_values)]
-        print(releated_list)
         liste = [
             [[0], [-self.minimum_x]],
         ]
@@ -29,23 +30,34 @@ class Dynamic_programming(object):
                     new_list[1].append(releated_list[x][1])
                     new_list[0].append(releated_list[x][0])
                     liste.append(new_list)
-        print(liste)
         return max(liste, key=lambda x: sum(x[0]))
 
     def set_distance_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.distance_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        last_count = 0
+        for x in liste:
+            last_count += int(x)
+            self.distance_values.append(last_count)
 
     def set_profit_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.profit_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        self.profit_values = [int(x) for x in liste]
 
 
 if __name__ == "__main__":
-    dynamic_programming = Dynamic_programming(5, "distance.txt", "profit.txt")
+    a = time.time()
+    dynamic_programming = Dynamic_programming(100, "Dist_on.csv", "Kar_on.csv")
     best_one = dynamic_programming.dynamic_programming()
     best_one[1].pop(0)
     best_one[0] = sum(best_one[0])
-    print(best_one)
+    print("result:", best_one[0])
+    b = time.time()
+    print(b - a)
