@@ -61,5 +61,5 @@ if __name__ == "__main__":
     brute_force = Brute_force(100, "Dist_on.csv", "Kar_on.csv")
     result = sum([x[0] for x in brute_force.brute_force()])
     b = time.time()
-    print(result)
+    print("result:", result)
     print(b-a)

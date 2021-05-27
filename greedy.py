@@ -1,5 +1,7 @@
 import sys
 from itertools import combinations
+import time
+import csv
 
 
 class Node(object):
@@ -22,9 +24,12 @@ class Greedy(object):
         self.set_profit_value_file(profit_f_path)
         liste = list(zip(self.distance_values, self.profit_values))
         self.merkez_node = self.greedy(liste)
-        print(self.find_best(self.merkez_node.next_list))
+        result_list = self.find_best(self.merkez_node.next_list)
+        print("result:", result_list[1])
 
     def find_best(self, liste):
+        if len(liste) == 0:
+            return [[], 0]
         if len(liste[0].next_list) > 0:
             result = [[], 0]
             listeler = []
@@ -71,15 +76,27 @@ class Greedy(object):
         return merkez_node
 
     def set_distance_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.distance_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        last_count = 0
+        for x in liste:
+            last_count += int(x)
+            self.distance_values.append(last_count)
 
     def set_profit_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.profit_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        self.profit_values = [int(x) for x in liste]
 
 
 if __name__ == "__main__":
-    greedy = Greedy(5, "distance.txt", "profit.txt")
+    a = time.time()
+    greedy = Greedy(100, "Dist_on.csv", "Kar_on.csv")
+    b = time.time()
+    print(b-a)

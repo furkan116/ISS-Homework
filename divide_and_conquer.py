@@ -1,5 +1,7 @@
 import sys
 from itertools import combinations
+import csv
+import time
 
 
 class Divide_and_conquer(object):
@@ -10,8 +12,14 @@ class Divide_and_conquer(object):
         self.set_distance_value_file(distance_f_path)
         self.set_profit_value_file(profit_f_path)
         self.liste = list(zip(self.profit_values, self.distance_values))
-        print(self.liste)
-        self.mergeSort([0, 1, 2, 3, 4, 5, 6])
+
+    def mergesort_algorithm(self):
+        result = self.mergeSort(range(len(self.liste)))
+        sum = 0
+        for x in result:
+            sum += self.liste[x][0]
+        return sum
+
 
     def this_way(self, arr, start, end):
         if start+1 >= end:
@@ -58,18 +66,32 @@ class Divide_and_conquer(object):
             else:
                 result.append(arr[index])
                 index += 1
-        print("result:", result)
+        return result
 
     def set_distance_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.distance_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        last_count = 0
+        for x in liste:
+            last_count += int(x)
+            self.distance_values.append(last_count)
 
     def set_profit_value_file(self, path):
-        dosya = open(path, "r")
-        txt = dosya.read()
-        self.profit_values = [int(x) for x in txt.split()]
+        liste = []
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in reader:
+                liste = row[0].split(',')
+        self.profit_values = [int(x) for x in liste]
 
 
 if __name__ == "__main__":
-    divide_and_conquer = Divide_and_conquer(5, "distance.txt", "profit.txt")
+    a = time.time()
+    divide_and_conquer = Divide_and_conquer(100, "Dist_on.csv", "Kar_on.csv")
+    result = divide_and_conquer.mergesort_algorithm()
+    print("result:", result)
+    b = time.time()
+    print(b - a)
