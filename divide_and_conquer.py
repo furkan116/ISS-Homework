@@ -2,6 +2,8 @@ import sys
 from itertools import combinations
 import csv
 import time
+csv.field_size_limit(sys.maxsize)
+print("max", sys.maxsize)
 
 
 class Divide_and_conquer(object):
@@ -15,49 +17,43 @@ class Divide_and_conquer(object):
 
     def mergesort_algorithm(self):
         result = self.mergeSort(range(len(self.liste)))
-        sum = 0
-        for x in result:
-            sum += self.liste[x][0]
-        return sum
-
-
-    def this_way(self, arr, start, end):
-        if start+1 >= end:
-            return [[arr[start]], self.liste[arr[start]][1]]
-        else:
-            index = start
-            result_list = []
-            while index+1 < end and self.liste[index][1] - self.liste[arr[start]][1] < self.minimum_x:
-                result_list.append(self.this_way(arr, index+2, end))
-                index += 1
-            max_one = result_list[0]
-            for x in result_list:
-                if x[1] > max_one[1]:
-                    max_one = x
-            max_one[0].insert(0, arr[start])
-            max_one[1] += self.liste[arr[start]][1]
-            return max_one
+        return [self.liste[x] for x in result]
 
     def fix_problems(self, arr, left, right):
-        if right - left == 0:
-            return [arr[left]]
-        elif right - left == 1:
-            return [max(arr[left], arr[right])]
-        else:
-            left_one = self.this_way(arr, left, right)
-            right_one = self.this_way(arr, left+1, right)
-            if left_one[1] > right_one[1]:
-                return left_one[0]
+        liste = []
+        for x in range(arr[left], arr[right]+1):# N - 1
+            liste.append([self.liste[x][1], self.liste[x][0], x])
+        return [x[2] for x in self.greedy(liste)]
+
+    def findMax(self, liste):
+        max1 = [0, 0]
+        for i in liste:
+            if i[1] > max1[1]:
+                max1 = i
+        return max1
+
+    def removeMax(self, max1, x, liste):
+        i = 0
+        while i != len(liste):
+            if max1[0] - x < liste[i][0] < max1[0] + x:
+                liste.remove(liste[i])
             else:
-                return right_one[0]
+                i += 1
+
+    def greedy(self, liste):
+        result = []
+        while len(liste) != 0:
+            result.append(self.findMax(liste))
+            self.removeMax(result[-1], self.minimum_x, liste)
+        return result
 
     def mergeSort(self, arr):
-        index = 0
-        result = []
-        while len(arr) != index + 1:
+        index = 0 # 1
+        result = [] # 1
+        while len(arr) != index + 1: # N+1
             if self.liste[index+1][1] - self.liste[index][1] < self.minimum_x:
-                cur_index = index
-                while self.liste[cur_index+1][1] - self.liste[cur_index][1] < self.minimum_x and len(arr) != cur_index + 2:
+                cur_index = index # 1
+                while self.liste[cur_index+1][1] - self.liste[cur_index][1] < self.minimum_x and len(arr) != cur_index + 2:# N - 1
                     cur_index += 1
                 fixed_list = self.fix_problems(arr, index, cur_index+1 if len(arr) == cur_index + 2 else cur_index)
                 index = cur_index + 1
@@ -66,6 +62,8 @@ class Divide_and_conquer(object):
             else:
                 result.append(arr[index])
                 index += 1
+            if len(arr) == index + 1 and self.liste[index][1] - self.liste[result[-1]][1] >= self.minimum_x:
+                    result.append(arr[index])
         return result
 
     def set_distance_value_file(self, path):
@@ -89,9 +87,11 @@ class Divide_and_conquer(object):
 
 
 if __name__ == "__main__":
+    divide_and_conquer = Divide_and_conquer(100, "Dist_birmilyon.csv", "Kar_birmilyon.csv")
     a = time.time()
-    divide_and_conquer = Divide_and_conquer(100, "Dist_on.csv", "Kar_on.csv")
     result = divide_and_conquer.mergesort_algorithm()
     print("result:", result)
+    print("length:", len(result))
+    print("sum", sum([x[0] for x in result]))
     b = time.time()
     print(b - a)
