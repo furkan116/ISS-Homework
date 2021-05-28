@@ -13,18 +13,18 @@ class Dynamic_programming(object):
         self.set_profit_value_file(profit_f_path)
 
     def dynamic_programming(self):
-        releated_list = [[x, y] for x, y in zip(self.profit_values, self.distance_values)]
+        releated_list = [[x, y] for x, y in zip(self.profit_values, self.distance_values)]# N defa
         liste = [
-            [[0], [-self.minimum_x]],
+            [[0], [-self.minimum_x]],# 1
         ]
-        for x in range(len(releated_list)):
-            for y in range(len(liste)):
+        for x in range(len(releated_list)):# N defa
+            for y in range(len(liste)):# N defa
                 if releated_list[x][1] - liste[y][1][-1] >= self.minimum_x:
                     liste[y][1].append(releated_list[x][1])
                     liste[y][0].append(releated_list[x][0])
                 else:
                     new_list = [[], []]
-                    for z in range(len(liste[y][0])-1):
+                    for z in range(len(liste[y][0])-1):# N Defa
                         new_list[1].append(liste[y][1][z])
                         new_list[0].append(liste[y][0][z])
                     new_list[1].append(releated_list[x][1])

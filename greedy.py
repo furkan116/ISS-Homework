@@ -30,7 +30,7 @@ class Greedy(object):
     def find_best(self, liste):
         if len(liste) == 0:
             return [[], 0]
-        if len(liste[0].next_list) > 0:
+        elif len(liste[0].next_list) > 0:
             result = [[], 0]
             listeler = []
             for x in liste:

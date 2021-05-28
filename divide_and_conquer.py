@@ -87,7 +87,7 @@ class Divide_and_conquer(object):
 
 
 if __name__ == "__main__":
-    divide_and_conquer = Divide_and_conquer(100, "Dist_birmilyon.csv", "Kar_birmilyon.csv")
+    divide_and_conquer = Divide_and_conquer(1000, "Dist_birmilyon.csv", "Kar_birmilyon.csv")
     a = time.time()
     result = divide_and_conquer.mergesort_algorithm()
     print("result:", result)

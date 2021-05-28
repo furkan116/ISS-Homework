@@ -13,12 +13,12 @@ class Brute_force(object):
         self.set_profit_value_file(profit_f_path)
 
     def is_valid_array(self, array):
-        distances = [x[1] for x in array]
-        temp = [x for x in distances]
+        distances = [x[1] for x in array]#n
+        temp = [x for x in distances]#n
         temp.reverse()
         index = 0
-        while index+1 != len(distances):
-            if distances[index+1] - distances[index] < self.minimum_x:
+        while index + 1 != len(distances):#n
+            if distances[index + 1] - distances[index] < self.minimum_x:
                 return False
             index += 1
         return True
@@ -29,10 +29,9 @@ class Brute_force(object):
         all_combinations.pop(0)
         valid_arrays = []
         for z in all_combinations:
-            liste = [x for x in z if self.is_valid_array(x)]
+            liste = [x for x in z if self.is_valid_array(x)]# 2 üzeri n -1 * 3n
             for x in liste:
                 valid_arrays.append(x)
-        profit_list = [sum([x[0] for x in y]) for y in valid_arrays]
         #return max(profit_list)  # if asking max profit
         return max(valid_arrays, key=lambda x: sum([y[0] for y in x]))  # return both of them
 
@@ -57,9 +56,12 @@ class Brute_force(object):
 
 
 if __name__ == "__main__":
+    brute_force = Brute_force(100, "Dist_yuz.csv", "Kar_yuz.csv")
     a = time.time()
-    brute_force = Brute_force(100, "Dist_on.csv", "Kar_on.csv")
-    result = sum([x[0] for x in brute_force.brute_force()])
+    result_list = brute_force.brute_force()
+    print(result_list)
+    print("length:", len(result_list))
+    result = sum([x[0] for x in result_list])
     b = time.time()
     print("result:", result)
     print(b-a)
