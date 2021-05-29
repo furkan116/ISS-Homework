@@ -2,6 +2,7 @@ import sys
 from itertools import combinations
 import csv
 import time
+csv.field_size_limit(sys.maxsize)
 
 
 class Dynamic_programming(object):
@@ -12,13 +13,26 @@ class Dynamic_programming(object):
         self.set_distance_value_file(distance_f_path)
         self.set_profit_value_file(profit_f_path)
 
+    def find_best(self, liste):
+        max_baz = [[], []]
+        max_kar = 0
+        for x in liste:
+            toplam_kar = sum(x[0])
+            if toplam_kar > max_kar:
+                max_kar = toplam_kar
+                max_baz = x
+        return [max_baz]
+
     def dynamic_programming(self):
         releated_list = [[x, y] for x, y in zip(self.profit_values, self.distance_values)]# N defa
+        releated_list = releated_list[:100]
         liste = [
             [[0], [-self.minimum_x]],# 1
         ]
         for x in range(len(releated_list)):# N defa
             for y in range(len(liste)):# N defa
+                print(y)
+                print(liste)
                 if releated_list[x][1] - liste[y][1][-1] >= self.minimum_x:
                     liste[y][1].append(releated_list[x][1])
                     liste[y][0].append(releated_list[x][0])
@@ -30,6 +44,7 @@ class Dynamic_programming(object):
                     new_list[1].append(releated_list[x][1])
                     new_list[0].append(releated_list[x][0])
                     liste.append(new_list)
+            liste = self.find_best(liste)
         return max(liste, key=lambda x: sum(x[0]))
 
     def set_distance_value_file(self, path):
@@ -54,10 +69,13 @@ class Dynamic_programming(object):
 
 if __name__ == "__main__":
     a = time.time()
+    #print(sys.argv[1])
+    print("X:", sys.argv[1], "N:", 100)
     dynamic_programming = Dynamic_programming(100, "Dist_on.csv", "Kar_on.csv")
     best_one = dynamic_programming.dynamic_programming()
     best_one[1].pop(0)
     best_one[0] = sum(best_one[0])
+    print("length", len(best_one[1]))
     print("result:", best_one[0])
     b = time.time()
     print(b - a)
