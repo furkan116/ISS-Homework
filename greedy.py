@@ -1,81 +1,39 @@
-import sys
-from itertools import combinations
-import time
-import csv
-
-
-class Node(object):
-    def __init__(self, distance, profit):
-        self.distance = distance
-        self.profit = profit
-        self.next_list = []
-        self.prev = []
-
-    def __str__(self):
-        return f'distance:%d, profit:%d' % (self.distance, self.profit)
+import sys#işletim sistem, kütüphanesi
+import time# ne kadar sürede çalıştığını ölçmek için time kütüphanesi
+import csv#csv dosyalarını okumak için
+csv.field_size_limit(sys.maxsize)#csv nin okuma limitini arttır
 
 
 class Greedy(object):
-    def __init__(self, minimum_x, distance_f_path="distance.txt", profit_f_path="profit.txt"):
+    def __init__(self, minimum_x, distance_f_path="distance.txt", profit_f_path="profit.txt"):#istenilen şekilde initialize et
         self.minimum_x = minimum_x
-        self.distance_values = []
-        self.profit_values = []
-        self.set_distance_value_file(distance_f_path)
-        self.set_profit_value_file(profit_f_path)
-        liste = list(zip(self.distance_values, self.profit_values))
-        self.merkez_node = self.greedy(liste)
-        result_list = self.find_best(self.merkez_node.next_list)
-        print("result:", result_list[1])
+        self.distance_values = []#uzaklıklar
+        self.profit_values = []#karlar
+        self.set_distance_value_file(distance_f_path)#uzaklıkları dosyadan oku
+        self.set_profit_value_file(profit_f_path)#karları dosyadan
+        self.liste = list(zip(self.distance_values, self.profit_values))#baz istasyonlarını oluştur
 
-    def find_best(self, liste):
-        if len(liste) == 0:
-            return [[], 0]
-        elif len(liste[0].next_list) > 0:
-            result = [[], 0]
-            listeler = []
-            for x in liste:
-                temp_list = self.find_best(x.next_list)
-                temp_list[1] += x.profit
-                temp_list[0].insert(0, x.distance)
-                listeler.append(temp_list)
-            for x in listeler:
-                if x[1] > result[1]:
-                    result[0] = x[0]
-                    result[1] = x[1]
-            return result
-        else:
-            result = [[], 0]
-            for x in liste:
-                if x.profit > result[1]:
-                    result[1] = x.profit
-                    result[0] = [x.distance]
-            return result
+    def findMax(self):#en karlı baz istasyonunu bul
+        max1 = [0, 0]
+        for i in self.liste:
+            if i[1] > max1[1]:
+                max1 = i
+        return max1
 
-    def greedy(self, liste):
-        merkez_node = Node(-self.minimum_x, 0)
-        cur_list = [merkez_node]
-        liste.insert(0, [merkez_node.distance, merkez_node.profit])
-        x = 1
-        while x < len(liste):
-            new_node = Node(liste[x][0], liste[x][1])
-            new_cur_list = []
-            for y in cur_list:
-                new_cur_list.append(y)
-            for y in cur_list:
-                if new_node.distance - y.distance >= self.minimum_x:
-                    y.next_list.append(new_node)
-                    new_node.prev.append(y)
-                if new_node not in new_cur_list:
-                    new_cur_list.append(new_node)
-                if x+2 < len(liste) and liste[x+2][0] - new_node.distance >= self.minimum_x:
-                    for z in new_node.prev:
-                        if z in new_cur_list:
-                            new_cur_list.remove(z)
-            cur_list = new_cur_list
-            x += 1
-        return merkez_node
+    def removeMax(self, max1, x):#bulunan baz istasyonu ile çakışan baz istasyonlarını listeden sil
+        i = 0
+        for y in self.liste:
+            if max1[0] - x < y[0] < max1[0] + x:
+                self.liste.remove(y)
 
-    def set_distance_value_file(self, path):
+    def greedy(self):
+        result = []
+        while len(self.liste) != 0:#listenin eleman sayısı sıfır olmadığı sürece
+            result.append(self.findMax())# en karlı baz istasyonunu sonuçlara ekle
+            self.removeMax(result[-1], self.minimum_x)# en karlı baz istasyonu ile çakışan baz istasyonlarını sil
+        return result
+
+    def set_distance_value_file(self, path):#csv dosyasından oku
         liste = []
         with open(path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -84,19 +42,22 @@ class Greedy(object):
         last_count = 0
         for x in liste:
             last_count += int(x)
-            self.distance_values.append(last_count)
+            self.distance_values.append(last_count)#uzaklık listesine ekle
 
-    def set_profit_value_file(self, path):
+    def set_profit_value_file(self, path):#csv dosyasından oku
         liste = []
         with open(path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in reader:
                 liste = row[0].split(',')
-        self.profit_values = [int(x) for x in liste]
+        self.profit_values = [int(x) for x in liste]#kar listesine ekle
 
 
 if __name__ == "__main__":
-    a = time.time()
-    greedy = Greedy(100, "Dist_on.csv", "Kar_on.csv")
-    b = time.time()
-    print(b-a)
+    greedy = Greedy(100, "Dist_yuzbin.csv", "Kar_yuzbin.csv")#algoritmayı hazırla
+    a = time.time()  # başlangıç zamanı
+    result = greedy.greedy()#algoritmayı çalıştır
+    print("length:", len(result))#maximum karı veren baz istasyonlarının sayısı
+    print("result:", sum([x[1] for x in result]))#maximum kar
+    b = time.time()#bitiş zamanı
+    print(b-a)#çalışma zamanı, saniye cinsinden
